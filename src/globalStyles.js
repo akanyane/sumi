@@ -14,15 +14,4 @@ export const GlobalStyle = createGlobalStyle`
                   TakaoExGothic , 'MotoyaLCedar' , 'Droid Sans Japanese' , sans-serif;
     
   }
-  // Scrollbar CSS
-  //::-webkit-scrollbar {
-  //  background-color: #212529;
-  //}
-  //::-webkit-scrollbar-track {
-  //  background: #212529;
-  //}
-  //::-webkit-scrollbar-thumb {
-  //  background: #047a84;
-  //  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-  //}
 `;
