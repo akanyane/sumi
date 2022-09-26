@@ -3,11 +3,11 @@ import { createGlobalStyle } from 'styled-components';
 export const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
-    color: white;
+    color: RGB(227, 116, 142);
     text-decoration: none;
     padding: 0;
     box-sizing: border-box;
-    background: #212529;
+    background: RGB(106, 151, 215);
     overflow: hidden;
     font-family : 'ヒラギノ角ゴ ProN' , 'Hiragino Kaku Gothic ProN' , '游ゴシック' , '游ゴシック体' , YuGothic , 
                   'Yu Gothic' , 'メイリオ' , Meiryo , 'ＭＳ ゴシック' , 'MS Gothic' , HiraKakuProN-W3 , 'TakaoExゴシック' , 
