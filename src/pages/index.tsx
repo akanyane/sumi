@@ -6,6 +6,7 @@ import { Box, Flex} from "@chakra-ui/react";
 
 import Card from "../components/card";
 import Header from "../components/header";
+import Display from '../components/display';
 
 const Home = ({ data }) => {
   const[kanji, setKanji] = useState([])
@@ -40,8 +41,9 @@ const Home = ({ data }) => {
         {/*            display={data.length} pageNumber={pageNumber} */}
         {/*            />*/}
       <Header />
+      <Display totalOfCharacters={data.length} />
       <Flex align="center" justify="center" wrap="wrap">
-        {kanji.map((kanji) => (<Card character={kanji} key={kanji} />))}
+        {kanji.map((character: string, index: number) => (<Card character={character} key={character + index} />))}
       </Flex>
 
     </>
