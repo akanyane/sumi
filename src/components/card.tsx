@@ -10,10 +10,25 @@ import {
   Button,
   useColorModeValue,
 } from '@chakra-ui/react';
+import getCharacterInformation from "../utils/getCharacterInformation";
+import {useEffect, useState} from "react";
 
-const Card = ({ kanji }) => {
-  return (
-    <Center py={6}>
+const Card = ({ character }) => {
+  const [data, setData] = useState<any>()
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await getCharacterInformation(character)
+      setData(response);
+    }
+
+    fetchData()
+      .catch(console.error);
+  }, [])
+
+  // const { kanji, grade, stroke_count, meanings } = data;
+
+  return (data ?
+    <Center py={3} margin={3}>
       <Box
         maxW={'270px'}
         w={'full'}
@@ -25,29 +40,13 @@ const Card = ({ kanji }) => {
         <Box p={6}>
           <Stack spacing={0} align={'center'} mb={5}>
             <Heading fontSize={'7xl'} fontWeight={400} fontFamily={'body'}>
-            {kanji}
+            {data.kanji}
             </Heading>
-            <Text color={'gray.500'}>Frontend Developer</Text>
-          </Stack>
-
-          <Stack direction={'row'} justify={'center'} spacing={6}>
-            <Stack spacing={0} align={'center'}>
-              <Text fontWeight={600}>23k</Text>
-              <Text fontSize={'sm'} color={'gray.500'}>
-                Followers
-              </Text>
-            </Stack>
-            <Stack spacing={0} align={'center'}>
-              <Text fontWeight={600}>23k</Text>
-              <Text fontSize={'sm'} color={'gray.500'}>
-                Followers
-              </Text>
-            </Stack>
           </Stack>
 
         </Box>
       </Box>
-    </Center>
+    </Center> : null
   );
 }
 

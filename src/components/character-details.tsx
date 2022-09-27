@@ -1,0 +1,143 @@
+import {
+  Box,
+  chakra,
+  Container,
+  Stack,
+  Text,
+  Image,
+  Flex,
+  VStack,
+  Button,
+  Heading,
+  SimpleGrid,
+  StackDivider,
+  useColorModeValue,
+  VisuallyHidden,
+  List,
+  ListItem, Center,
+} from '@chakra-ui/react';
+
+const CharacterDetails = ({ character }) => {
+  console.log(character)
+  return (
+    <Container maxW={'7xl'}>
+      <SimpleGrid
+        columns={{ base: 1, lg: 2 }}
+        spacing={{ base: 8, md: 10 }}
+        py={{ base: 18, md: 24 }}>
+
+          <Center >
+            <Box
+              w={'full'}
+              h={'full'}
+              bg={useColorModeValue('white', 'gray.800')}
+              boxShadow={'2xl'}
+              rounded={'md'}
+              overflow={'hidden'}>
+              <Box p={6}>
+                <Stack spacing={0} align={'center'} mb={5}>
+                  <Heading fontSize={'15rem'} fontWeight={400} fontFamily={'body'}>
+                    {character.kanji}
+                  </Heading>
+                </Stack>
+              </Box>
+            </Box>
+          </Center>
+
+        <Stack spacing={{ base: 6, md: 10 }}>
+
+          <Stack
+            spacing={{ base: 4, sm: 6 }}
+            direction={'column'}
+            divider={
+              <StackDivider
+                borderColor={useColorModeValue('gray.200', 'gray.600')}
+              />
+            }>
+
+            <Box>
+              <Text
+                fontSize={{ base: '16px', lg: '18px' }}
+                color={useColorModeValue('yellow.500', 'yellow.300')}
+                fontWeight={'500'}
+                textTransform={'uppercase'}
+                mb={'4'}>
+                Meanings
+              </Text>
+
+              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
+                <List spacing={2}>
+                  {character.meanings.map((meaning, index) => (<ListItem key={meaning + index}>{meaning}</ListItem>))}
+                </List>
+                <List spacing={2}>
+                  <ListItem>Anti‑magnetic</ListItem>
+                  <ListItem>Chronometer</ListItem>
+                  <ListItem>Small seconds</ListItem>
+                </List>
+              </SimpleGrid>
+            </Box>
+            <Box>
+              <Text
+                fontSize={{ base: '16px', lg: '18px' }}
+                // color={useColorModeValue('yellow.500', 'yellow.300')}
+                fontWeight={'500'}
+                textTransform={'uppercase'}
+                mb={'4'}>
+                Product Details
+              </Text>
+
+              <List spacing={2}>
+                <ListItem>
+                  <Text as={'span'} fontWeight={'bold'}>
+                    Grade:
+                  </Text>{' '}
+                  {character.grade}
+                </ListItem>
+                <ListItem>
+                  <Text as={'span'} fontWeight={'bold'}>
+                    Stroke count:
+                  </Text>{' '}
+                  {character.stroke_count}
+                </ListItem>
+                <ListItem>
+                  <Text as={'span'} fontWeight={'bold'}>
+                    JLPT:
+                  </Text>{' '}
+                  {character.jlpt}
+                </ListItem>
+                <ListItem>
+                  <Text as={'span'} fontWeight={'bold'}>
+                    Unicode:
+                  </Text>{' '}
+                  {character.unicode}
+                </ListItem>
+                <ListItem>
+                  <Text as={'span'} fontWeight={'bold'}>
+                    Dial color:
+                  </Text>{' '}
+                  Black
+                </ListItem>
+                <ListItem>
+                  <Text as={'span'} fontWeight={'bold'}>
+                    Crystal:
+                  </Text>{' '}
+                  Domed, scratch‑resistant sapphire crystal with anti‑reflective
+                  treatment inside
+                </ListItem>
+                <ListItem>
+                  <Text as={'span'} fontWeight={'bold'}>
+                    Water resistance:
+                  </Text>{' '}
+                  5 bar (50 metres / 167 feet){' '}
+                </ListItem>
+              </List>
+            </Box>
+          </Stack>
+
+        </Stack>
+      </SimpleGrid>
+    </Container>
+  )
+}
+
+export default CharacterDetails;
