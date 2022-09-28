@@ -58,7 +58,6 @@ const CharacterDetails = ({ character }) => {
             <Box>
               <Text
                 fontSize={{ base: '16px', lg: '18px' }}
-                color={useColorModeValue('yellow.500', 'yellow.300')}
                 fontWeight={'500'}
                 textTransform={'uppercase'}
                 mb={'4'}>
@@ -68,11 +67,6 @@ const CharacterDetails = ({ character }) => {
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
                 <List spacing={2}>
                   {character.meanings.map((meaning, index) => (<ListItem key={meaning + index}>{meaning}</ListItem>))}
-                </List>
-                <List spacing={2}>
-                  <ListItem>Anti‑magnetic</ListItem>
-                  <ListItem>Chronometer</ListItem>
-                  <ListItem>Small seconds</ListItem>
                 </List>
               </SimpleGrid>
             </Box>

@@ -12,7 +12,7 @@ const Display = ({ totalOfCharacters }) => {
     <Box
       bg={useColorModeValue('white', 'gray.800')}
       color={useColorModeValue('gray.700', 'gray.200')}
-      boxShadow={'2xl'}
+       boxShadow={'1xl'}
       >
       <Container
         as={Stack}
@@ -23,11 +23,10 @@ const Display = ({ totalOfCharacters }) => {
         justify={{ base: 'center', md: 'center' }}
         align={{ base: 'center', md: 'center' }}
         >
-          <Heading fontSize={'5xl'} fontWeight={400} fontFamily={'body'}>
+          <Heading fontSize={'2xl'} fontWeight={400} fontFamily={'body'}>
           {totalOfCharacters}
           </Heading>
       </Container>
-      <StackDivider borderColor={useColorModeValue('gray.200', 'gray.600')}/>
     </Box>
   );
 }

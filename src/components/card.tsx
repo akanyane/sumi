@@ -1,60 +1,41 @@
 import {
   Heading,
-  Avatar,
   Box,
   Center,
-  Image,
-  Flex,
-  Text,
   Stack,
-  Button,
   useColorModeValue,
-} from '@chakra-ui/react';
-import getCharacterInformation from "../utils/getCharacterInformation";
-import {useEffect, useState} from "react";
-import NextLink from "next/link"
+  useColorMode,
+} from "@chakra-ui/react";
+import NextLink from "next/link";
 
 const Card = ({ character }) => {
-  const [data, setData] = useState<any>()
-  useEffect(() => {
-    const fetchData = async () => {
-      const response = await getCharacterInformation(character)
-      setData(response);
-    }
+  const { colorMode } = useColorMode();
 
-    fetchData()
-      .catch(console.error);
-  }, [])
-
-  // const { kanji, grade, stroke_count, meanings } = data;
-
-  return (data ?
-    <NextLink href={`/${data.kanji}`} passHref>
-      <Center py={3} margin={3}>
-        <Box
-          maxW={'270px'}
-          w={'full'}
-          bg={useColorModeValue('white', 'gray.800')}
-          boxShadow={'2xl'}
-          rounded={'md'}
-          overflow={'hidden'}
-          alignContent="center"
-          justifyContent={"center"}
-          alignItems="center"
-          >
-          
-          <Box p={6}>
-            <Stack spacing={0} align={'center'} mb={5}>
-              <Heading fontSize={'7xl'} fontWeight={400} fontFamily={'body'}>
-              {data.kanji}
-              </Heading>
-            </Stack>
-
+  return (
+    <NextLink href={`/${character}`} passHref>
+        <Center py={3} margin={3} >
+          <Box
+            maxW={'270px'}
+            w={'full'}
+            bg={useColorModeValue('white', 'gray.800')}
+            boxShadow={'2xl'}
+            rounded={'md'}
+            overflow={'hidden'}
+            _hover={{
+              cursor: "pointer",
+              bg: colorMode === 'light' ? 'gray.100' : 'gray.900'
+            }}
+            >
+            <Box p={6}>
+              <Stack spacing={0} align={'center'} >
+                <Heading fontSize={'7xl'} fontWeight={400} fontFamily={'body'}>
+                {character}
+                </Heading>
+              </Stack>
+            </Box>
           </Box>
-        </Box>
-      </Center>
+        </Center>
     </NextLink>
-     : null
   );
 }
 

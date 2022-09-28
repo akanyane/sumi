@@ -15,6 +15,7 @@ import {
   useBreakpointValue,
   useDisclosure,
   useColorMode,
+  Img,
 } from '@chakra-ui/react';
 import {
   HamburgerIcon,
@@ -54,12 +55,8 @@ const Header = () => {
             />
           </Flex>
           <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
-            <Text
-                textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
-                fontFamily={'heading'}
-                color={useColorModeValue('gray.800', 'white')}>
-              Kanji
-            </Text>
+
+            <Img src='/logo.png' h={7} />
 
             <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
               <DesktopNav />
