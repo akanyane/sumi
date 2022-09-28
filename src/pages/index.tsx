@@ -9,23 +9,23 @@ import Header from "../components/header";
 import Display from '../components/display';
 
 const Home = ({ data }) => {
-  const[kanji, setKanji] = useState([])
+  const[page, setPage] = useState([])
   const[pageNumber, setPageNumber] = useState(1)
-
-  useEffect(()=> {
-    setKanji((data.slice(pageNumber*300, pageNumber*300 + 300)).map(k => k))
-  },[pageNumber])
 
   const router = useRouter()
 
   useEffect(() => {
-    // Always do navigations after the first render
-    router.push('/?page=1', undefined, { shallow: true })
+    if(!router.query.page){
+      router.push('/?page=1', undefined, { shallow: true })
+    }
   }, [])
-  console.log(typeof Number(router.query.page))
+
+  useEffect(()=> {
+    setPage((data.slice(pageNumber*300, pageNumber*300 + 300)).map(k => k))
+  },[pageNumber])
+
   useEffect(() => {
-    // The counter changed!
-    setKanji((data.slice(Number(router.query.page)*300, Number(router.query.page)*300 + 300)).map(k => k))
+    setPage((data.slice(Number(router.query.page)*300, Number(router.query.page)*300 + 300)).map(k => k))
   }, [router.query.page])
 
   return (
@@ -43,7 +43,7 @@ const Home = ({ data }) => {
       <Header />
       <Display totalOfCharacters={data.length} />
       <Flex align="center" justify="center" wrap="wrap">
-        {kanji.map((character: string, index: number) => (<Card character={character} key={character + index} />))}
+        {page.map((character: string, index: number) => (<Card character={character} key={character + index} />))}
       </Flex>
 
     </>

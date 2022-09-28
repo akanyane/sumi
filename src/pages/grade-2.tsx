@@ -7,7 +7,6 @@ import {useEffect, useState} from "react";
 import {useRouter} from "next/router";
 
 const Grade2 = ({ data }) => {
-
   return (
     <>
       <Head>
@@ -25,7 +24,7 @@ const Grade2 = ({ data }) => {
   )
 }
 
-export default Grade1;
+export default Grade2;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const res = await fetch('https://kanjiapi.dev/v1/kanji/grade-2');

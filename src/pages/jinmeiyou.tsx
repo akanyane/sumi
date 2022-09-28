@@ -6,12 +6,11 @@ import {GetServerSideProps} from "next";
 import {useEffect, useState} from "react";
 import {useRouter} from "next/router";
 
-const Jinmeyou = ({ data }) => {
-
+const Jinmeiyou = ({ data }) => {
   return (
     <>
       <Head>
-        <title>Jinmeyou</title>
+        <title>Jinmeiyou</title>
         <meta name="description" content="Kanji Dictionary" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -20,15 +19,14 @@ const Jinmeyou = ({ data }) => {
       <Flex align="center" justify="center" wrap="wrap">
         {data.map((kanji) => (<Card character={kanji} key={kanji} />))}
       </Flex>
-
     </>
   )
 }
 
-export default Jinmeyou;
+export default Jinmeiyou;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const res = await fetch('https://kanjiapi.dev/v1/kanji/jinmeyou');
+  const res = await fetch('https://kanjiapi.dev/v1/kanji/jinmeiyou');
   const data = await res.json()
   return {
     props: {

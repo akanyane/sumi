@@ -1,3 +1,4 @@
+import NextLink from "next/link";
 import {
   Box,
   Flex,
@@ -55,8 +56,10 @@ const Header = () => {
             />
           </Flex>
           <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
-
-            <Img src='/logo.png' h={7} />
+          
+            <NextLink href="/" passHref>
+              <Img src='/logo.png' h={6} cursor="pointer"/>
+            </NextLink>
 
             <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
               <DesktopNav />
@@ -244,36 +247,36 @@ const NAV_ITEMS: Array<NavItem> = [
       },
       {
         label: 'Grade 2',
-        href: '#',
+        href: '/grade-2',
       },
       {
         label: 'Grade 3',
-        href: '#',
+        href: '/grade-3',
       },
       {
         label: 'Grade 4',
-        href: '#',
+        href: '/grade-4',
       },
       {
         label: 'Grade 5',
-        href: '#',
+        href: '/grade-5',
       },
       {
         label: 'Grade 6',
-        href: '#',
+        href: '/grade-6',
       },
       {
         label: 'Grade 8',
-        href: '#',
+        href: '/grade-8',
       },
     ],
   },
   {
     label: 'Jouyou',
-    href: '#',
+    href: '/jouyou',
   },
   {
     label: 'Jinmeiyou',
-    href: '#',
+    href: '/jinmeiyou',
   },
 ];

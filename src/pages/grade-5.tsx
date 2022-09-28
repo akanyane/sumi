@@ -11,7 +11,7 @@ const Grade5 = ({ data }) => {
   return (
     <>
       <Head>
-        <title>Grade 1</title>
+        <title>Grade 5</title>
         <meta name="description" content="Kanji Dictionary" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
