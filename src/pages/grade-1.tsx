@@ -5,6 +5,8 @@ import Card from "../components/card";
 import {GetServerSideProps} from "next";
 import {useEffect, useState} from "react";
 import {useRouter} from "next/router";
+import Footer from "../components/footer";
+import Pagination from "../components/pagination";
 
 const Grade1 = ({ data }) => {
 
@@ -20,7 +22,8 @@ const Grade1 = ({ data }) => {
       <Flex align="center" justify="center" wrap="wrap">
         {data.map((kanji) => (<Card character={kanji} key={kanji} />))}
       </Flex>
-
+      {/* <Pagination pageNumbers={pages.length} actualPageNumber={Number(router.query.page)} /> */}
+      <Footer />
     </>
   )
 }

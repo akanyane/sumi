@@ -3,6 +3,7 @@ import Header from "../components/header";
 import { Flex } from "@chakra-ui/react";
 import Card from "../components/card";
 import { GetServerSideProps } from "next";
+import Footer from "../components/footer";
 
 const Jouyou = ({ data }) => {
   return (
@@ -16,6 +17,7 @@ const Jouyou = ({ data }) => {
       <Flex align="center" justify="center" wrap="wrap">
         {data.map((kanji) => (<Card character={kanji} key={kanji} />))}
       </Flex>
+      <Footer />
     </>
   )
 }

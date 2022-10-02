@@ -4,6 +4,7 @@ import { GetServerSideProps, GetStaticProps } from "next";
 import Header from "../components/header";
 import CharacterDetails from "../components/character-details";
 import Head from "next/head";
+import Footer from '../components/footer';
 
 const Character = ({ foundCharacter }) => {
   console.log(foundCharacter)
@@ -16,6 +17,7 @@ const Character = ({ foundCharacter }) => {
       </Head>
       <Header />
       <CharacterDetails character={foundCharacter} />
+      <Footer />
     </>
   )
 }

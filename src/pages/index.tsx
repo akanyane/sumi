@@ -7,26 +7,37 @@ import { Box, Flex} from "@chakra-ui/react";
 import Card from "../components/card";
 import Header from "../components/header";
 import Display from '../components/display';
+import Pagination from '../components/pagination';
+import Footer from '../components/footer';
 
 const Home = ({ data }) => {
   const[page, setPage] = useState([])
   const[pageNumber, setPageNumber] = useState(1)
+  
+  const pages: [][] = data.reduce((pageArray: any[], character: string, index: number) => {
+    const perPage: number = 50; 
+    const pageIndex: number = Math.floor(index/perPage);
+  
+    if(!pageArray[pageIndex]) {
+      pageArray[pageIndex] = [];
+    };
+  
+    pageArray[pageIndex].push(character);
+  
+    return pageArray;
+  }, []);
 
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
-    if(!router.query.page){
+    if(!router.query.page || Number(router.query.page) > pages.length){
       router.push('/?page=1', undefined, { shallow: true })
     }
-  }, [])
-
-  useEffect(()=> {
-    setPage((data.slice(pageNumber*300, pageNumber*300 + 300)).map(k => k))
-  },[pageNumber])
+  }, []);
 
   useEffect(() => {
-    setPage((data.slice(Number(router.query.page)*300, Number(router.query.page)*300 + 300)).map(k => k))
-  }, [router.query.page])
+    setPageNumber(Number(router.query.page) <= pages.length ? Number(router.query.page) : 1)
+  }, [router.query.page]);
 
   return (
     <>
@@ -36,16 +47,13 @@ const Home = ({ data }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       
-        {/*<Pagination previousPage={() => pageNumber < 2 ? null : setPageNumber(pageNumber - 1)}*/}
-        {/*            nextPage={() => pageNumber < 43 ? setPageNumber(pageNumber + 1) : null}*/}
-        {/*            display={data.length} pageNumber={pageNumber} */}
-        {/*            />*/}
       <Header />
       <Display totalOfCharacters={data.length} />
       <Flex align="center" justify="center" wrap="wrap">
-        {page.map((character: string, index: number) => (<Card character={character} key={character + index} />))}
+        {pages[pageNumber].map((character: string, index: number) => (<Card character={character} key={character + index} />))}
       </Flex>
-
+      <Pagination pageNumbers={pages.length} actualPageNumber={Number(router.query.page)} />
+      <Footer />
     </>
   );
 }

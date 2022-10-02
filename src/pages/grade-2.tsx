@@ -5,6 +5,7 @@ import Card from "../components/card";
 import {GetServerSideProps} from "next";
 import {useEffect, useState} from "react";
 import {useRouter} from "next/router";
+import Footer from "../components/footer";
 
 const Grade2 = ({ data }) => {
   return (
@@ -19,7 +20,7 @@ const Grade2 = ({ data }) => {
       <Flex align="center" justify="center" wrap="wrap">
         {data.map((kanji) => (<Card character={kanji} key={kanji} />))}
       </Flex>
-
+      <Footer />
     </>
   )
 }
