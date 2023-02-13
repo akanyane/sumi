@@ -1,11 +1,7 @@
-import { useRouter } from 'next/router'
-import { GetServerSideProps, GetStaticProps } from "next";
-
-import Header from "../components/header";
-import CharacterDetails from "../components/character-details";
+import { GetServerSideProps } from "next";
 import Head from "next/head";
-import Footer from '../components/footer';
-
+// import { Index, Footer, CharacterDetails } from "@components"
+import { Header, Footer, CharacterDetails } from "../components"
 const Character = ({ foundCharacter }) => {
   console.log(foundCharacter)
   return (
@@ -30,9 +26,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const response = await fetch(`https://kanjiapi.dev/v1/kanji/${character}`);
   const foundCharacter = await response.json()
 
-  if (!foundCharacter) {
+  if (foundCharacter?.error) {
     return {
-      props: { hasError: true },
+      notFound: true,
     }
   }
 

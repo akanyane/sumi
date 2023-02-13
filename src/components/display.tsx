@@ -4,7 +4,6 @@ import {
   Stack,
   Heading,
   useColorModeValue,
-  StackDivider,
 } from '@chakra-ui/react';
 
 const Display = ({ totalOfCharacters }) => {

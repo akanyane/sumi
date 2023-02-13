@@ -13,11 +13,10 @@ import {
   PopoverTrigger,
   PopoverContent,
   useColorModeValue,
-  useBreakpointValue,
   useDisclosure,
   useColorMode,
   Img,
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
 import {
   HamburgerIcon,
   CloseIcon,
@@ -25,7 +24,7 @@ import {
   ChevronRightIcon,
   MoonIcon,
   SunIcon,
-} from '@chakra-ui/icons';
+} from "@chakra-ui/icons";
 
 const Header = () => {
   const { isOpen, onToggle } = useDisclosure();
@@ -33,7 +32,7 @@ const Header = () => {
   return (
       <Box>
         <Flex
-            bg={useColorModeValue('white', 'gray.800')}
+            bg={useColorModeValue("white", 'gray.800')}
             color={useColorModeValue('gray.600', 'white')}
             minH={'60px'}
             py={{ base: 2 }}

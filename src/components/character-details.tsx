@@ -12,6 +12,7 @@ import {
 } from '@chakra-ui/react';
 
 const CharacterDetails = ({ character }) => {
+  console.log(character)
   return (
     <Container maxW={'7xl'}>
       <SimpleGrid
@@ -103,7 +104,7 @@ const CharacterDetails = ({ character }) => {
                 </List>
               </Stack>
             </SimpleGrid>
-            
+
             <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10} py={5}>
               <Stack align='center' >
                   <Text
@@ -130,7 +131,7 @@ const CharacterDetails = ({ character }) => {
                 </List>
               </Stack>
             </SimpleGrid>
-            
+
           </Stack>
 
         </Stack>

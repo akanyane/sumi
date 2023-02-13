@@ -2,25 +2,24 @@ import Head from 'next/head'
 import { GetServerSideProps } from 'next';
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/router'
-import { Box, Flex} from "@chakra-ui/react";
+import { Flex} from "@chakra-ui/react";
 
 import Card from "../components/card";
-import Header from "../components/header";
 import Display from '../components/display';
 import Pagination from '../components/pagination';
-import Footer from '../components/footer';
+import { Header, Footer, Characters } from "../components";
 
 const Home = ({ data }) => {
   const[page, setPage] = useState([])
   const[pageNumber, setPageNumber] = useState(1)
   
   const pages: [][] = data.reduce((pageArray: any[], character: string, index: number) => {
-    const perPage: number = 50; 
+    const perPage = 50; 
     const pageIndex: number = Math.floor(index/perPage);
   
     if(!pageArray[pageIndex]) {
       pageArray[pageIndex] = [];
-    };
+    }
   
     pageArray[pageIndex].push(character);
   
@@ -56,16 +55,16 @@ const Home = ({ data }) => {
       <Footer />
     </>
   );
-}
+};
 
 export default Home;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const res = await fetch('https://kanjiapi.dev/v1/kanji/all');
-  const data = await res.json()
+  const data = await res.json();
   return {
     props: {
       data,
-    }
-  }
+    },
+  };
 };

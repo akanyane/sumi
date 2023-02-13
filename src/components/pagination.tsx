@@ -13,12 +13,12 @@ const Pagination = ({ pageNumbers, actualPageNumber }) => {
   const pages = []
   for(let i = 1; i <= pageNumbers; i++) {
     pages.push(i);
-  };
+  }
 
   const isDisabled = (selectedPage: number): boolean => 
     selectedPage === actualPageNumber ? true : false;
 
-  const firstPageNumber: number = 1;
+  const firstPageNumber = 1;
   const lastPageNumber: number = pageNumbers;
 
   const router = useRouter();
