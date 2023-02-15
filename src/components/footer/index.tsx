@@ -21,7 +21,7 @@ const Footer = () => {
         justify={{ base: 'center', md: 'space-between' }}
         align={{ base: 'center', md: 'center' }}>
         <Img src='/logo.png' h={6} cursor="pointer"/>
-        <Text>© 2022 Kanji Dictionary. All rights reserved</Text>
+        <Text>© 2023 Kanji Dictionary. All rights reserved</Text>
       </Container>
     </Box>
   );
