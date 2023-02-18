@@ -1,3 +1,4 @@
+"use client"
 import NextLink from "next/link";
 import {
   Box,
@@ -8,7 +9,6 @@ import {
   Stack,
   Collapse,
   Icon,
-  Link,
   Popover,
   PopoverTrigger,
   PopoverContent,
@@ -17,6 +17,7 @@ import {
   useColorMode,
   Img,
 } from "@chakra-ui/react";
+import { Link } from '@chakra-ui/next-js'
 import {
   HamburgerIcon,
   CloseIcon,
@@ -56,9 +57,9 @@ const Header = () => {
           </Flex>
           <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
           
-            <NextLink href="/" passHref>
+            <Link href="/">
               <Img src='/logo.png' h={6} cursor="pointer"/>
-            </NextLink>
+            </Link>
 
             <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
               <DesktopNav />

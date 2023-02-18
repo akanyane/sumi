@@ -1,3 +1,4 @@
+"use client"
 import React, { FC } from "react";
 import { Flex } from '@chakra-ui/react';
 import { Card } from "../index";
