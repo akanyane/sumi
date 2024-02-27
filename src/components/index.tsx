@@ -1,3 +1,4 @@
+'use client'
 export { default as Card } from "./card";
 export { default as Character} from "./character";
 export { default as Header } from "./header";

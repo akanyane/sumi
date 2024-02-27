@@ -2,7 +2,6 @@
 import {
   useQuery,
 } from 'react-query';
-import { Skeleton, Stack, Flex } from '@chakra-ui/react';
 import {Characters, LoadingCharacters} from "../components";
 
 

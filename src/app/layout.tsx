@@ -6,8 +6,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from 'react-query'
-import { CacheProvider } from "@chakra-ui/next-js";
-import { ChakraProvider } from '@chakra-ui/react'
+import { Providers } from "./providers";
 
 const queryClient = new QueryClient()
 
@@ -20,18 +19,16 @@ export default function RootLayout({
     <html lang="en">
       <head />
       <body>
-      <QueryClientProvider client={queryClient}>
-        <CacheProvider>
-          <ChakraProvider>
+        <QueryClientProvider client={queryClient}>
+        <Providers>
             <PageWrapper>
             <Header />
             {children}
             <Footer />
             </PageWrapper>
-          </ChakraProvider>
-        </CacheProvider>
+            </Providers>
         </QueryClientProvider>
       </body>
     </html>
-  );
+  )
 }
