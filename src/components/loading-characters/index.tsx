@@ -1,19 +1,11 @@
-"use client"
-import React, { FC } from "react";
-import { Skeleton, Flex, Spinner } from "@chakra-ui/react";
+"use client";
 
-const LoadingCharacters: FC = () => {
-  return (
-    <Flex align="center" justify="center">
-      <Spinner
-        thickness='4px'
-        speed='0.65s'
-        emptyColor='gray.200'
-        // color='black.300'
-        size='xl'
-      />
-    </Flex>
-  )
-}
+import { Flex, Spinner } from "@chakra-ui/react";
+
+const LoadingCharacters = () => (
+  <Flex align="center" justify="center" py={10}>
+    <Spinner borderWidth="4px" animationDuration="0.65s" size="xl" />
+  </Flex>
+);
 
 export default LoadingCharacters;

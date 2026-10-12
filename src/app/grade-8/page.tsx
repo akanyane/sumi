@@ -1,28 +1,10 @@
+import type { Metadata } from "next";
+import { KanjiList } from "@/components";
 
-import {
-  useQuery,
-} from 'react-query'
-import { Characters, LoadingCharacters } from "../../components"
-
-export const metadata = {
-  title: 'Grade 8',
+export const metadata: Metadata = {
+  title: "Grade 8",
 };
 
-const Grade8 = () => {
-  const { isLoading, isError, data, error } = useQuery('kanji-grade-8', () =>
-    fetch('https://kanjiapi.dev/v1/kanji/grade-8').then(res =>
-      res.json())
-  )
-
-  if(isLoading) {
-    return <LoadingCharacters />
-  }
-
-  return (
-    <>
-      <Characters characters={data} />
-    </>
-  )
+export default function Grade8() {
+  return <KanjiList list="grade-8" />;
 }
-
-export default Grade8;

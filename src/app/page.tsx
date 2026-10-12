@@ -1,20 +1,5 @@
-"use client";
-import {
-  useQuery,
-} from 'react-query';
-import {Characters, LoadingCharacters} from "../components";
-
+import { KanjiList } from "@/components";
 
 export default function Home() {
-    const { isLoading, isError, data, error } = useQuery('kanji', () =>
-      fetch('https://kanjiapi.dev/v1/kanji/all').then(res =>
-        res.json())
-    )
-
-    if(isLoading) {
-      return <LoadingCharacters />
-    }
-  return (
-    <Characters characters={data.slice(0, 100)} />
-  );
+  return <KanjiList list="all" limit={100} />;
 }

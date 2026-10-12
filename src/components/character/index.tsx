@@ -1,146 +1,111 @@
-"use client"
+"use client";
+
 import {
   Box,
   Container,
-  Stack,
-  Text,
   Heading,
-  SimpleGrid,
-  StackDivider,
-  useColorModeValue,
   List,
-  ListItem, Center,
-} from '@chakra-ui/react';
+  SimpleGrid,
+  Stack,
+  StackSeparator,
+  Text,
+} from "@chakra-ui/react";
+import type { ReactNode } from "react";
+import type { Kanji } from "@/lib/kanji-api";
 
-const Character = ({ character }) => {
-  return (
-    <Container maxW={'7xl'}>
-      <SimpleGrid
-        columns={{ base: 1, lg: 2 }}
-        spacing={{ base: 8, md: 10 }}
-        py={{ base: 18, md: 24 }}>
+const Section = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) => (
+  <Stack align="center">
+    <Text
+      fontSize={{ base: "16px", lg: "18px" }}
+      fontWeight="500"
+      textTransform="uppercase"
+      mb={4}
+    >
+      {title}
+    </Text>
+    {children}
+  </Stack>
+);
 
-          <Center >
-            <Box
-              w={'full'}
-              h={'full'}
-              bg={useColorModeValue('white', 'gray.800')}
-              boxShadow={'2xl'}
-              rounded={'md'}
-              display="flex"
-              justifyContent={"center"}
-              alignItems={"ceenter"}
-              overflow={'hidden'}>
-              <Box p={6}  mb="auto" mt="auto">
-                <Stack spacing={0} align={'center'} mb="auto" mt="auto">
-                  <Heading fontSize={'15rem'} fontWeight={400} fontFamily={'body'}>
-                    {character.kanji}
-                  </Heading>
-                </Stack>
-              </Box>
-            </Box>
-          </Center>
+const Items = ({ items }: { items: string[] }) => (
+  <List.Root gap={2} variant="plain" alignItems="center">
+    {items.map((item) => (
+      <List.Item key={item}>{item}</List.Item>
+    ))}
+  </List.Root>
+);
 
-        <Stack spacing={{ base: 6, md: 10 }}>
+const Detail = ({ label, value }: { label: string; value: ReactNode }) => (
+  <List.Item>
+    <Text as="span" fontWeight="bold">
+      {label}:
+    </Text>{" "}
+    {value ?? "—"}
+  </List.Item>
+);
 
-          <Stack
-            spacing={{ base: 4, sm: 6 }}
-            direction={'column'}
-            divider={
-              <StackDivider
-                borderColor={useColorModeValue('gray.200', 'gray.600')}
-              />
-            }
-            bg={useColorModeValue('white', 'gray.800')}
-            boxShadow={'2xl'}
-            rounded={'md'}
-            >
+const Character = ({ character }: { character: Kanji }) => (
+  <Container maxW="7xl">
+    <SimpleGrid
+      columns={{ base: 1, lg: 2 }}
+      gap={{ base: 8, md: 10 }}
+      py={{ base: 18, md: 24 }}
+    >
+      <Box
+        w="full"
+        h="full"
+        bg="bg.panel"
+        shadow="2xl"
+        rounded="md"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        overflow="hidden"
+        p={6}
+      >
+        <Heading as="h1" fontSize="15rem" fontWeight={400} lineHeight="1">
+          {character.kanji}
+        </Heading>
+      </Box>
 
-            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10} py={5}>
-              <Stack align="center">
-                <Text
-                  fontSize={{ base: '16px', lg: '18px' }}
-                  fontWeight={'500'}
-                  textTransform={'uppercase'}
-                  mb={'4'}>
-                  Meanings
-                </Text>
-                <List spacing={2}>
-                  {character.meanings.map((meaning, index) => (<ListItem key={meaning + index}>{meaning}</ListItem>))}
-                </List>
-              </Stack>
+      <Stack
+        gap={{ base: 4, sm: 6 }}
+        separator={<StackSeparator />}
+        bg="bg.panel"
+        shadow="2xl"
+        rounded="md"
+      >
+        <SimpleGrid columns={{ base: 1, md: 2 }} gap={10} py={5}>
+          <Section title="Meanings">
+            <Items items={character.meanings} />
+          </Section>
+          <Section title="Main Details">
+            <List.Root gap={2} variant="plain">
+              <Detail label="Grade" value={character.grade} />
+              <Detail label="Stroke count" value={character.stroke_count} />
+              <Detail label="JLPT" value={character.jlpt} />
+              <Detail label="Unicode" value={character.unicode} />
+            </List.Root>
+          </Section>
+        </SimpleGrid>
 
-              <Stack align="center">
-                <Text
-                  fontSize={{ base: '16px', lg: '18px' }}
-                  fontWeight={'500'}
-                  textTransform={'uppercase'}
-                  mb={'4'}>
-                  Main Details
-                </Text>
-
-                <List spacing={2}>
-                  <ListItem>
-                    <Text as={'span'} fontWeight={'bold'}>
-                      Grade:
-                    </Text>{' '}
-                    {character.grade}
-                  </ListItem>
-                  <ListItem>
-                    <Text as={'span'} fontWeight={'bold'}>
-                      Stroke count:
-                    </Text>{' '}
-                    {character.stroke_count}
-                  </ListItem>
-                  <ListItem>
-                    <Text as={'span'} fontWeight={'bold'}>
-                      JLPT:
-                    </Text>{' '}
-                    {character.jlpt}
-                  </ListItem>
-                  <ListItem>
-                    <Text as={'span'} fontWeight={'bold'}>
-                      Unicode:
-                    </Text>{' '}
-                    {character.unicode}
-                  </ListItem>
-                </List>
-              </Stack>
-            </SimpleGrid>
-
-            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10} py={5}>
-              <Stack align='center' >
-                  <Text
-                    fontSize={{ base: '16px', lg: '18px' }}
-                    fontWeight={'500'}
-                    textTransform={'uppercase'}
-                    mb={'4'}>
-                    Kun Readings
-                  </Text>
-                  <List spacing={2}>
-                    {character.kun_readings.map((meaning, index) => (<ListItem key={meaning + index}>{meaning}</ListItem>))}
-                  </List>
-              </Stack>
-              <Stack align="center">
-                <Text
-                  fontSize={{ base: '16px', lg: '18px' }}
-                  fontWeight={'500'}
-                  textTransform={'uppercase'}
-                  mb={'4'}>
-                  On Readings
-                </Text>
-                <List spacing={2}>
-                  {character.on_readings.map((meaning, index) => (<ListItem key={meaning + index}>{meaning}</ListItem>))}
-                </List>
-              </Stack>
-            </SimpleGrid>
-
-          </Stack>
-
-        </Stack>
-      </SimpleGrid>
-    </Container>
-  )
-}
+        <SimpleGrid columns={{ base: 1, md: 2 }} gap={10} py={5}>
+          <Section title="Kun Readings">
+            <Items items={character.kun_readings} />
+          </Section>
+          <Section title="On Readings">
+            <Items items={character.on_readings} />
+          </Section>
+        </SimpleGrid>
+      </Stack>
+    </SimpleGrid>
+  </Container>
+);
 
 export default Character;

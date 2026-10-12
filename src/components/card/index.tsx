@@ -1,43 +1,28 @@
 "use client";
-import {
-  Heading,
-  Box,
-  Center,
-  Stack,
-  useColorModeValue,
-  useColorMode,
-} from "@chakra-ui/react";
+
+import { Box, Heading } from "@chakra-ui/react";
 import NextLink from "next/link";
 
-const Card = ({ character }) => {
-  const { colorMode } = useColorMode();
-
-  return (
-    <NextLink href={`/${character}`} passHref>
-        <Center py={3} margin={3} >
-          <Box
-            maxW={'270px'}
-            w={'full'}
-            bg={useColorModeValue('white', 'gray.800')}
-            boxShadow={'2xl'}
-            rounded={'md'}
-            overflow={'hidden'}
-            _hover={{
-              cursor: "pointer",
-              bg: colorMode === 'light' ? 'gray.100' : 'gray.900'
-            }}
-            >
-            <Box p={6}>
-              <Stack spacing={0} align={'center'} >
-                <Heading fontSize={'7xl'} fontWeight={400} fontFamily={'body'}>
-                {character}
-                </Heading>
-              </Stack>
-            </Box>
-          </Box>
-        </Center>
+const Card = ({ character }: { character: string }) => (
+  <Box asChild m={3}>
+    <NextLink href={`/${character}`}>
+      <Box
+        w="full"
+        maxW="270px"
+        p={6}
+        bg="bg.panel"
+        shadow="lg"
+        rounded="md"
+        textAlign="center"
+        transition="background 0.2s"
+        _hover={{ bg: "bg.muted" }}
+      >
+        <Heading as="span" fontSize="7xl" fontWeight={400} lineHeight="1.1">
+          {character}
+        </Heading>
+      </Box>
     </NextLink>
-  );
-}
+  </Box>
+);
 
-export default Card
+export default Card;

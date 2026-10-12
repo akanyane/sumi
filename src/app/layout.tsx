@@ -1,34 +1,28 @@
-"use client"
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
+import { Footer, Header, PageWrapper } from "@/components";
+import { Provider } from "@/components/ui/provider";
 
-import { ReactNode } from "react";
-import { Footer, Header, PageWrapper } from "../components";
-import {
-  QueryClient,
-  QueryClientProvider,
-} from 'react-query'
-import { Providers } from "./providers";
+export const metadata: Metadata = {
+  title: {
+    default: "Kanji",
+    template: "%s | Kanji",
+  },
+  description: "Kanji Dictionary",
+};
 
-const queryClient = new QueryClient()
-
-export default function RootLayout({
-  children, 
-}: {
-  children: ReactNode,
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <head />
+    <html lang="en" suppressHydrationWarning>
       <body>
-        <QueryClientProvider client={queryClient}>
-        <Providers>
-            <PageWrapper>
+        <Provider>
+          <PageWrapper>
             <Header />
             {children}
             <Footer />
-            </PageWrapper>
-            </Providers>
-        </QueryClientProvider>
+          </PageWrapper>
+        </Provider>
       </body>
     </html>
-  )
+  );
 }

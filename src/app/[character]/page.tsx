@@ -1,23 +1,30 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { KanjiDetail } from "@/components";
 
-import {
-  useQuery,
-} from 'react-query';
-import { Character, LoadingCharacters as LoadingCharacter } from "../../components"
+type Props = {
+  params: Promise<{ character: string }>;
+};
 
-
-const Jouyou= ({ params }) => {
-  const { character }= params;
-
-  const { isLoading, isError, data, error } = useQuery(`kanji-${character}`, () =>
-    fetch(`https://kanjiapi.dev/v1/kanji/${character}`).then(res =>
-      res.json())
-  )
-
-  if(isLoading) {
-    return <LoadingCharacter />
+// Next sometimes hands over the segment still encoded and sometimes already decoded
+const decode = async (params: Props["params"]) => {
+  const { character } = await params;
+  try {
+    return decodeURIComponent(character);
+  } catch {
+    return character;
   }
+};
 
-  return <Character character={data} />
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  return { title: await decode(params) };
 }
 
-export default Jouyou;
+export default async function KanjiPage({ params }: Props) {
+  const character = await decode(params);
+
+  // Anything that isn't a single character can't be a kanji
+  if ([...character].length !== 1) notFound();
+
+  return <KanjiDetail character={character} />;
+}

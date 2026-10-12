@@ -1,14 +1,14 @@
-"use client"
-import React, { FC } from "react";
-import { Flex } from '@chakra-ui/react';
-import { Card } from "../index";
+"use client";
 
-const Characters: FC<any> = ({ characters }) => {
-  return (
-    <Flex align="center" justify="center" wrap="wrap">
-      {characters.map((character: string, index: number) => (<Card character={character} key={`${character}-${index}`} />))}
-    </Flex>
-  );
-};
+import { Flex } from "@chakra-ui/react";
+import Card from "../card";
+
+const Characters = ({ characters }: { characters: string[] }) => (
+  <Flex align="center" justify="center" wrap="wrap" py={3}>
+    {characters.map((character) => (
+      <Card character={character} key={character} />
+    ))}
+  </Flex>
+);
 
 export default Characters;
