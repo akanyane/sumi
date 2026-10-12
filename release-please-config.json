@@ -1,0 +1,12 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bootstrap-sha": "c5765dc60f7481584fa11c5452d34ac7a49b576f",
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "package-name": "kanji-next-web",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true
+    }
+  }
+}
