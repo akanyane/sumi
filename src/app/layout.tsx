@@ -51,6 +51,16 @@ export const metadata: Metadata = {
   description:
     "Dicionário e plataforma de estudo de kanji: ordem dos traços animada, repetição espaçada (FSRS), prática de escrita e progresso salvo no seu aparelho.",
   applicationName: "Sumi",
+  metadataBase: new URL("https://sumi.akanyane.dev"),
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: "Sumi",
+    title: "墨 Sumi — Kanji",
+    description:
+      "Ordem dos traços animada, repetição espaçada e prática de escrita para aprender kanji.",
+    locale: "pt_BR",
+  },
 };
 
 export const viewport: Viewport = {

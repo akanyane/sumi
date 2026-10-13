@@ -1,5 +1,7 @@
 # 墨 Sumi — Kanji
 
+https://sumi.akanyane.dev
+
 Dicionário e plataforma de estudo de kanji com a direção visual “Sumi & Ma”: ordem dos traços animada, repetição espaçada (FSRS), prática de escrita com verificação traço a traço e progresso salvo no aparelho (IndexedDB).
 
 ```bash
