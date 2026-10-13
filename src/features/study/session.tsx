@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import type { Grade } from "ts-fsrs";
 import {
+  type Kanji,
   type KanjiIndex,
   meaningOf,
   pad,
@@ -14,9 +15,11 @@ import {
   strokesQuery,
   useKanjiIndex,
   useStrokes,
+  type Word,
 } from "@/lib/data";
 import { db, type StudyCard } from "@/lib/db";
-import { cleanReading } from "@/lib/kana";
+import { cleanReading, romaji } from "@/lib/kana";
+import { mnemonicFor } from "@/lib/mnemonics";
 import { isReduced } from "@/lib/motion";
 import { getSettings } from "@/lib/settings";
 import { speak } from "@/lib/speech";
@@ -32,6 +35,7 @@ import {
 } from "@/lib/srs";
 import { IconClose, IconSpeakerLg } from "@/ui/icons";
 import { btn, Enso, Kbd, Skel } from "@/ui/primitives";
+import { PlayerControls, useStrokePlayer } from "@/ui/stroke-player";
 import { type Item, kindOf, makeItems } from "./items";
 import { Summary, type SummaryRow } from "./summary";
 import {
@@ -224,6 +228,104 @@ function Frame({
   );
 }
 
+const startPhase = (x?: Item): Phase =>
+  x?.type === "flip" && x.isNew ? "reveal" : "ask";
+
+/** First contact with a kanji: teach it (strokes, meaning, readings, a word) instead of quizzing. */
+function NewKanjiIntro({
+  k,
+  strokes,
+  word,
+}: {
+  k: Kanji;
+  strokes: StrokeData | undefined;
+  word?: Word;
+}) {
+  const { data: index } = useKanjiIndex();
+  const player = useStrokePlayer(k.k, strokes, { autoplay: 350 });
+  const { romaji: showRomaji } = getSettings();
+  const mn = mnemonicFor(k, index);
+  return (
+    <div className="grid w-full max-w-[720px] grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))] items-center gap-x-10 gap-y-6 text-left">
+      <div className="flex flex-col items-center gap-3">
+        <div className="relative aspect-square w-full max-w-[260px]">
+          <div ref={player.ref} className="absolute inset-0" />
+          {!strokes?.p.length && (
+            <span
+              lang="ja"
+              className="absolute inset-0 grid place-items-center font-k text-[200px] leading-none"
+            >
+              {k.k}
+            </span>
+          )}
+        </div>
+        {!!strokes?.p.length && (
+          <PlayerControls player={player} speeds={false} />
+        )}
+      </div>
+      <div className="flex flex-col gap-4">
+        <span className="label-mono !text-hanko">Kanji novo · observe</span>
+        <span className="text-[clamp(30px,5cqi,40px)] font-light leading-tight">
+          {meaningOf(k)}
+        </span>
+        <div className="flex flex-col gap-2">
+          {k.on.length > 0 && (
+            <span className="flex items-baseline gap-3">
+              <span className="w-9 font-mono text-[10px] tracking-[.12em] text-ink-3">
+                ON
+              </span>
+              <span
+                lang="ja"
+                className="font-goth text-xl font-medium tracking-[.06em]"
+              >
+                {k.on.slice(0, 3).join("・")}
+              </span>
+              {showRomaji && (
+                <span className="font-mono text-xs text-ink-3">
+                  {k.on.slice(0, 3).map(romaji).join(" · ")}
+                </span>
+              )}
+            </span>
+          )}
+          {k.kun.length > 0 && (
+            <span className="flex items-baseline gap-3">
+              <span className="w-9 font-mono text-[10px] tracking-[.12em] text-ink-3">
+                KUN
+              </span>
+              <span lang="ja" className="font-min text-xl">
+                {k.kun.slice(0, 3).map(cleanReading).join("・")}
+              </span>
+              {showRomaji && (
+                <span className="font-mono text-xs text-ink-3">
+                  {k.kun.slice(0, 3).map(romaji).join(" · ")}
+                </span>
+              )}
+            </span>
+          )}
+        </div>
+        {word && (
+          <button
+            type="button"
+            onClick={() => speak(word.r)}
+            className="flex items-end gap-4 self-start border-b border-line pb-2 text-left transition-colors hover:border-ink"
+          >
+            <ruby lang="ja" className="font-min text-2xl leading-none">
+              {word.w}
+              <rt className="pb-1">{word.r}</rt>
+            </ruby>
+            <span className="pb-0.5 text-sm text-ink-2">{word.g}</span>
+          </button>
+        )}
+        {mn && (
+          <p className="m-0 text-sm leading-relaxed text-pretty text-ink-2">
+            {mn}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 const WAVE = "M2 8 C 60 5, 120 10, 200 7 S 340 5, 398 8";
 
 function Runner({
@@ -239,7 +341,7 @@ function Runner({
 }) {
   const { items, cards, practice } = prep;
   const [i, setI] = useState(0);
-  const [phase, setPhase] = useState<Phase>("ask");
+  const [phase, setPhase] = useState<Phase>(() => startPhase(items[0]));
   const [pick, setPick] = useState<number | null>(null);
   const [built, setBuilt] = useState<number[]>([]);
   const [w, setW] = useState<WriteState>(freshWrite);
@@ -348,7 +450,7 @@ function Runner({
       } else {
         const advance = () => {
           setI(i + 1);
-          setPhase("ask");
+          setPhase(startPhase(items[i + 1]));
           setPick(null);
           setBuilt([]);
           setW(freshWrite());
@@ -359,7 +461,7 @@ function Runner({
       }
       setBusy(false);
     },
-    [it, phase, busy, correct, ws, practice, cards, i, items.length],
+    [it, phase, busy, correct, ws, practice, cards, i, items],
   );
 
   // keyboard: 1–4 answer/grade, Space flip/apply suggested, H hint, Esc exit
@@ -452,7 +554,9 @@ function Runner({
       rTitle = `Precisão ${ws}%${w.err ? ` · ${w.err} correç${w.err > 1 ? "ões" : "ão"}` : " · sem erros"}`;
       rTone = ws >= 70 ? "text-ink" : "text-hanko";
     } else
-      rTitle = it.isNew ? "Primeiro contato — como foi?" : "Como foi lembrar?";
+      rTitle = it.isNew
+        ? "Quando tiver absorvido, diga como foi"
+        : "Como foi lembrar?";
   }
   const kun = cleanReading(k.kun[0] ?? "");
   const builtChars = built.map((b) => (it.type === "build" ? it.tiles[b] : ""));
@@ -546,7 +650,10 @@ function Runner({
             )}
           </>
         )}
-        {it.type === "flip" && (
+        {it.type === "flip" && it.isNew && (
+          <NewKanjiIntro k={k} strokes={strokes} word={it.word} />
+        )}
+        {it.type === "flip" && !it.isNew && (
           <div className="flex flex-col items-center gap-5">
             <span
               lang="ja"
@@ -579,14 +686,19 @@ function Runner({
                 )}
               </div>
             ) : (
-              <button
-                type="button"
-                onClick={flip}
-                className={`${btn.secondary} gap-3`}
-              >
-                Mostrar resposta
-                <Kbd>ESPAÇO</Kbd>
-              </button>
+              <div className="flex flex-col items-center gap-3">
+                <span className="text-[15px] text-ink-2">
+                  Lembre o significado e a leitura, depois confira.
+                </span>
+                <button
+                  type="button"
+                  onClick={flip}
+                  className={`${btn.secondary} gap-3`}
+                >
+                  Mostrar resposta
+                  <Kbd>ESPAÇO</Kbd>
+                </button>
+              </div>
             )}
           </div>
         )}
@@ -691,7 +803,10 @@ function Runner({
       {reveal && (
         <div className="flex flex-col items-center gap-1.5 text-center">
           <span className={`text-[17px] ${rTone}`}>{rTitle}</span>
-          <span lang="ja" className="text-sm text-ink-2">
+          <span
+            lang="ja"
+            className={`text-sm text-ink-2 ${it.type === "flip" && it.isNew ? "hidden" : ""}`}
+          >
             {k.k} · {k.on[0] ?? ""} {kun && `· ${kun}`} — {meaningOf(k)}
           </span>
           {rNote && (
