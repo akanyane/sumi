@@ -122,12 +122,17 @@ export type QueueItem = { k: string; isNew: boolean };
 
 /**
  * Today's queue: due reviews first (most overdue first), then new kanji — the ones the user
- * added explicitly, then the next ones along the Jōyō path.
+ * added explicitly, then the next ones along the path (kana first when enabled, then Jōyō).
  */
 export function buildQueue(
   index: KanjiIndex,
   cards: Map<string, StudyCard>,
-  opts: { dailyGoal: number; newPerDay: number; newToday: number },
+  opts: {
+    dailyGoal: number;
+    newPerDay: number;
+    newToday: number;
+    kanaFirst?: boolean;
+  },
   now = new Date(),
 ): QueueItem[] {
   const all = [...cards.values()];
@@ -137,13 +142,20 @@ export function buildQueue(
     .slice(0, Math.max(opts.dailyGoal, 10))
     .map((c) => ({ k: c.k, isNew: false }));
 
-  const newSlots = Math.max(0, opts.newPerDay - opts.newToday);
+  const kanaLeft = opts.kanaFirst && index.kana.some((k) => !cards.has(k.k));
+  // kana are lighter than kanji, so the daily quota doubles while learning them
+  const newSlots = Math.max(
+    0,
+    opts.newPerDay * (kanaLeft ? 2 : 1) - opts.newToday,
+  );
   const added = all
     .filter((c) => c.state === State.New && !c.mastered)
     .sort((a, b) => a.addedAt.getTime() - b.addedAt.getTime())
     .map((c) => c.k);
   const path: string[] = [];
-  for (const k of index.jouyou) {
+  for (const k of opts.kanaFirst
+    ? [...index.kana, ...index.jouyou]
+    : index.jouyou) {
     if (added.length + path.length >= newSlots) break;
     if (!cards.has(k.k)) path.push(k.k);
   }

@@ -9,6 +9,8 @@ export type Settings = {
   reducedMotion: boolean;
   dailyGoal: number;
   newPerDay: number;
+  /** learn hiragana and katakana before the Jōyō path */
+  kanaFirst: boolean;
   density: "compact" | "comfortable" | "ficha";
   ghostGuide: boolean;
 };
@@ -20,6 +22,7 @@ export const DEFAULT_SETTINGS: Settings = {
   reducedMotion: false,
   dailyGoal: 20,
   newPerDay: 5,
+  kanaFirst: false,
   density: "comfortable",
   ghostGuide: true,
 };

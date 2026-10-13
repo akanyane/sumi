@@ -65,7 +65,15 @@ export function PaletteProvider({ children }: { children: ReactNode }) {
 
 type Group = { t: string; list: Kanji[] };
 
-function search(q: string, list: Kanji[]): Group[] {
+/** Short queries match word starts only ("ka" shouldn't hit "katakana radical"); longer ones match anywhere. */
+const matches = (text: string, q: string) =>
+  q.length < 4
+    ? fold(text)
+        .split(/[\s,;()/-]+/)
+        .some((w) => w.startsWith(q))
+    : fold(text).includes(q);
+
+function search(q: string, list: Kanji[], kana: Kanji[]): Group[] {
   const query = q.trim();
   if (!query) return [];
   const ql = fold(query);
@@ -81,8 +89,8 @@ function search(q: string, list: Kanji[]): Group[] {
           list
             .filter(
               (d) =>
-                d.m.some((m) => fold(m).includes(ql)) ||
-                (PT[d.k] ? fold(PT[d.k]).includes(ql) : false),
+                d.m.some((m) => matches(m, ql)) ||
+                (PT[d.k] ? matches(PT[d.k], ql) : false),
             )
             .sort((a, b) => {
               // exact word matches first
@@ -111,7 +119,15 @@ function search(q: string, list: Kanji[]): Group[] {
           ),
         )
       : [];
+  const gk = kana
+    .filter(
+      (d) =>
+        [...d.k].length === 1 &&
+        (chars.has(d.k) || d.kana?.r === ql || d.kana?.pair === query),
+    )
+    .slice(0, 6);
   return [
+    { t: "KANA", list: gk },
     { t: "KANJI", list: g1 },
     { t: "SIGNIFICADO", list: g2 },
     { t: "LEITURA", list: g3 },
@@ -141,7 +157,7 @@ function Palette({ onClose }: { onClose: () => void }) {
         .filter(Boolean) as Kanji[];
       return list.length ? [{ t: "RECENTES", list }] : [];
     }
-    return search(q, index.list);
+    return search(q, index.list, index.kana);
   }, [q, index, recents]);
   const flat = groups.flatMap((g) => g.list);
 
@@ -241,14 +257,17 @@ function Palette({ onClose }: { onClose: () => void }) {
                     <span className="flex min-w-0 flex-col gap-0.5">
                       <span className="text-[15px]">{meaningOf(d)}</span>
                       <span className="truncate text-xs text-ink-3">
-                        {d.m.join(", ")}
+                        {d.kana ? d.kana.script : d.m.join(", ")}
                       </span>
                     </span>
                     <span
                       lang="ja"
                       className="font-goth text-[13px] text-ink-2"
                     >
-                      {[d.on[0], d.kun[0] && cleanReading(d.kun[0])]
+                      {(d.kana
+                        ? [d.kana.pair]
+                        : [d.on[0], d.kun[0] && cleanReading(d.kun[0])]
+                      )
                         .filter(Boolean)
                         .join("・")}
                     </span>

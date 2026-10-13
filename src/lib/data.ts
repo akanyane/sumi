@@ -25,6 +25,21 @@ export type Kanji = {
   sv: 0 | 1;
   /** position in the index (grade, then frequency) */
   i: number;
+  /** present only for hiragana/katakana entries */
+  kana?: KanaInfo;
+};
+
+export type KanaInfo = {
+  script: "hiragana" | "katakana";
+  /** romaji */
+  r: string;
+  row: string;
+  col: number;
+  group: "basic" | "dakuten" | "combo";
+  origin: string | null;
+  /** the same sound in the other script */
+  pair: string;
+  ex: Word | null;
 };
 
 export type Word = { w: string; r: string; g: string };
@@ -39,21 +54,68 @@ export type KanjiIndex = {
   list: Kanji[];
   by: Map<string, Kanji>;
   jouyou: Kanji[];
+  /** hiragana + katakana in study order (basic → dakuten → combos) */
+  kana: Kanji[];
   kanjivg: string;
 };
 
+type RawKana = KanaInfo & { k: string; lk: string; s: number; sv: 0 | 1 };
+
+/** Kana share the Kanji shape so cards, sessions and lookups treat them uniformly. */
+const kanaToEntry = (x: RawKana, i: number): Kanji => ({
+  k: x.k,
+  g: null,
+  s: x.s,
+  m: [x.r],
+  on: [],
+  kun: [],
+  j: null,
+  u: [...x.k]
+    .map((c) => (c.codePointAt(0) ?? 0).toString(16).toUpperCase())
+    .join(" "),
+  f: null,
+  c: x.origin ? [x.origin] : [],
+  r: null,
+  so: "",
+  sr: "",
+  lk: x.lk,
+  sv: x.sv,
+  i,
+  kana: {
+    script: x.script,
+    r: x.r,
+    row: x.row,
+    col: x.col,
+    group: x.group,
+    origin: x.origin,
+    pair: x.pair,
+    ex: x.ex,
+  },
+});
+
+/** Hiragana / katakana (including yōon pairs like きゃ). */
+export const isKanaString = (s: string) =>
+  /^[\u3041-\u3096\u30a1-\u30fa]+$/.test(s);
+
 async function loadIndex(): Promise<KanjiIndex> {
-  const res = await fetch("/data/kanji.json");
+  const [res, kres] = await Promise.all([
+    fetch("/data/kanji.json"),
+    fetch("/data/kana.json"),
+  ]);
   if (!res.ok) throw new Error(`kanji.json ${res.status}`);
   const raw = (await res.json()) as {
     list: Omit<Kanji, "i">[];
     kanjivg: string;
   };
   const list = raw.list.map((k, i) => ({ ...k, i }) as Kanji);
+  const kana = kres.ok
+    ? ((await kres.json()) as { list: RawKana[] }).list.map(kanaToEntry)
+    : [];
   return {
     list,
-    by: new Map(list.map((k) => [k.k, k])),
+    by: new Map([...list, ...kana].map((k) => [k.k, k])),
     jouyou: list.filter((k) => k.g !== null && k.g <= 8),
+    kana,
     kanjivg: raw.kanjivg,
   };
 }
@@ -175,7 +237,8 @@ export function useRemoteKanji(k: string, enabled: boolean) {
 
 // ---------- labels ----------
 /** Portuguese meaning when we have one, English otherwise. */
-export const meaningOf = (k: Kanji) => PT[k.k] ?? k.m.slice(0, 2).join(", ");
+export const meaningOf = (k: Kanji) =>
+  k.kana ? k.kana.r : (PT[k.k] ?? k.m.slice(0, 2).join(", "));
 export const hasPt = (k: Kanji) => k.k in PT;
 
 /** Name of a component; Portuguese only unless `allowEnglish` (then falls back to kanjiapi). */
@@ -225,13 +288,13 @@ export const COLLECTIONS: Collection[] = [
   { id: "grade-8", label: "Secundário", ja: "中学", test: (k) => k.g === 8 },
   {
     id: "jouyou",
-    label: "Jōyō",
+    label: "Jouyou",
     ja: "常用",
     test: (k) => k.g !== null && k.g <= 8,
   },
   {
     id: "jinmeiyou",
-    label: "Jinmeiyō",
+    label: "Jinmeiyou",
     ja: "人名",
     test: (k) => k.g !== null && k.g >= 9,
   },

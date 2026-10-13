@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { type ReactNode, useEffect, useState } from "react";
+import { isKanaString } from "@/lib/data";
 import { db } from "@/lib/db";
 import { useSettings } from "@/lib/settings";
 import { startOfDay, statusOf, useCards } from "@/lib/srs";
@@ -18,16 +19,46 @@ import {
 } from "./icons";
 import { ProgressRing } from "./primitives";
 
-const NAV = [
-  { href: "/", label: "Explorar", num: "01", Icon: IconGrid },
-  { href: "/aprender", label: "Aprender", num: "02", Icon: IconBook },
-  { href: "/progresso", label: "Progresso", num: "03", Icon: IconTrend },
-] as const;
+const EXPLORE = {
+  href: "/",
+  label: "Explorar",
+  num: "01",
+  Icon: IconGrid,
+} as const;
+const KANA = {
+  href: "/kana",
+  label: "Kana",
+  num: "02",
+  Icon: IconGrid,
+} as const;
+const STUDY = {
+  href: "/aprender",
+  label: "Aprender",
+  num: "03",
+  Icon: IconBook,
+} as const;
+const PROGRESS = {
+  href: "/progresso",
+  label: "Progresso",
+  num: "04",
+  Icon: IconTrend,
+} as const;
+const NAV = [EXPLORE, KANA, STUDY, PROGRESS];
+
+const safeDecode = (s: string) => {
+  try {
+    return decodeURIComponent(s);
+  } catch {
+    return s;
+  }
+};
 
 function useActiveTab() {
   const path = usePathname();
   if (path.startsWith("/aprender")) return "/aprender";
   if (path.startsWith("/progresso")) return "/progresso";
+  if (path.startsWith("/kana") || isKanaString(safeDecode(path.slice(1))))
+    return "/kana";
   if (path.startsWith("/ajustes") || path.startsWith("/sistema"))
     return "/ajustes";
   return "/";
@@ -189,10 +220,10 @@ function BottomNav() {
   const palette = usePalette();
   const due = useDueCount();
   const items = [
-    { ...NAV[0] },
+    { ...EXPLORE },
     { href: "#buscar", label: "Buscar", Icon: IconSearch },
-    { ...NAV[1] },
-    { ...NAV[2] },
+    { ...STUDY },
+    { ...PROGRESS },
   ];
   return (
     <nav

@@ -14,8 +14,10 @@ export type Option = { l: string; sub: string; k: string };
 export type Item =
   | {
       type: "mc";
-      mode: "meaning" | "reading" | "pick" | "audio";
+      mode: "meaning" | "reading" | "pick" | "audio" | "sound";
       k: string;
+      /** kana exercise: options are sounds/kana rather than meanings/kanji */
+      kana?: boolean;
       label: string;
       q: string;
       qsub?: string;
@@ -183,6 +185,102 @@ function buildItem(
   };
 }
 
+// ---------- kana ----------
+function kanaDistractors(k: Kanji, index: KanjiIndex, n = 3): Kanji[] {
+  const info = k.kana;
+  if (!info) return [];
+  const out: Kanji[] = [];
+  const seenSound = new Set([info.r]);
+  const push = (x?: Kanji) => {
+    if (!x?.kana || out.length >= n || seenSound.has(x.kana.r)) return;
+    seenSound.add(x.kana.r);
+    out.push(x);
+  };
+  for (const c of [...k.lk]) push(index.by.get(c));
+  const same = index.kana.filter(
+    (x) =>
+      x.k !== k.k &&
+      x.kana?.script === info.script &&
+      x.kana.group === info.group,
+  );
+  // same row or same vowel column first — those are the ones that get mixed up
+  for (const x of shuffle(
+    same.filter((x) => x.kana?.row === info.row || x.kana?.col === info.col),
+  ))
+    push(x);
+  for (const x of shuffle(same)) push(x);
+  return out;
+}
+
+function kanaSoundItem(k: Kanji, index: KanjiIndex): Item | null {
+  const wrong = kanaDistractors(k, index).map((d) => ({
+    l: meaningOf(d),
+    sub: d.k,
+    k: d.k,
+  }));
+  if (wrong.length < 3) return null;
+  return {
+    type: "mc",
+    mode: "sound",
+    kana: true,
+    k: k.k,
+    label: "Kana → som",
+    q: "Como se lê?",
+    ...withAnswer({ l: meaningOf(k), sub: k.k, k: k.k }, wrong),
+    isNew: false,
+  };
+}
+
+function kanaPickItem(
+  k: Kanji,
+  index: KanjiIndex,
+  audio: boolean,
+): Item | null {
+  const wrong = kanaDistractors(k, index).map((d) => ({
+    l: d.k,
+    sub: meaningOf(d),
+    k: d.k,
+  }));
+  if (wrong.length < 3) return null;
+  return {
+    type: "mc",
+    mode: audio ? "audio" : "pick",
+    kana: true,
+    k: k.k,
+    label: audio ? "Áudio → kana" : "Som → kana",
+    q: audio ? k.k : meaningOf(k),
+    qsub: k.kana?.script,
+    ...withAnswer({ l: k.k, sub: meaningOf(k), k: k.k }, wrong),
+    isNew: false,
+  };
+}
+
+function kanaItem(
+  k: Kanji,
+  index: KanjiIndex,
+  data: StrokeData | undefined,
+  reps: number,
+  last: string,
+) {
+  const pool: (() => Item | null)[] = [
+    () => kanaSoundItem(k, index),
+    () => kanaPickItem(k, index, false),
+    () => kanaPickItem(k, index, true),
+  ];
+  if (data?.p.length && reps >= 1)
+    pool.push(() => ({
+      type: "write",
+      k: k.k,
+      label: "Escrever o kana",
+      isNew: false,
+    }));
+  for (const t of shuffle(pool)) {
+    const it = t();
+    if (it && kindOf(it) !== last) return it;
+  }
+  return kanaSoundItem(k, index) ?? kanaPickItem(k, index, false);
+}
+
 /** One exercise per queue entry, varying the kind so the session doesn't feel repetitive. */
 export function makeItems(
   queue: QueueItem[],
@@ -200,12 +298,19 @@ export function makeItems(
       return {
         type: "flip",
         k: ch,
-        label: "Kanji novo",
-        word: words[0],
+        label: k.kana ? "Kana novo" : "Kanji novo",
+        word: k.kana?.ex ?? words[0],
         isNew,
       } as Item;
     }
     const reps = cards.get(ch)?.reps ?? 0;
+    if (k.kana) {
+      const it = kanaItem(k, index, data, reps, last);
+      if (it) {
+        last = kindOf(it);
+        return it;
+      }
+    }
     const pool: (() => Item | null)[] = [
       () => meaningItem(k, index, isNew),
       () => readingItem(k, index, isNew),

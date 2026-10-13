@@ -299,7 +299,7 @@ export function WritingPad({
           i: i + 1,
           scores: [...w.scores, sc],
           msg: fin
-            ? "Kanji completo"
+            ? "Escrita completa"
             : `Traço ${i + 1} · ${sc}% — agora o ${i + 2}`,
           tone: "ok",
           done: fin,

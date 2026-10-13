@@ -4,10 +4,12 @@ import { useLiveQuery } from "dexie-react-hooks";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, ViewTransition } from "react";
+import { KanaDetail } from "@/features/kana/kana-detail";
 import {
   collectionOf,
   componentName,
   gradeLabel,
+  isKanaString,
   type Kanji,
   meaningOf,
   pad,
@@ -57,6 +59,11 @@ function useNavList(
 }
 
 export function KanjiDetail({ character }: { character: string }) {
+  if (isKanaString(character)) return <KanaDetail character={character} />;
+  return <KanjiDetailInner character={character} />;
+}
+
+function KanjiDetailInner({ character }: { character: string }) {
   const { data: index, isPending: indexPending } = useKanjiIndex();
   const local = index?.by.get(character);
   const remote = useRemoteKanji(character, !!index && !local);

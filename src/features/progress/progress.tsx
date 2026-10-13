@@ -129,6 +129,14 @@ export function Progress() {
       const list = index.list.filter((k) => k.j === j);
       return { l: `N${j}`, done: masteredOf(list), total: list.length };
     });
+    const kana = (["hiragana", "katakana"] as const).map((script) => {
+      const list = index.kana.filter((k) => k.kana?.script === script);
+      return {
+        l: script === "hiragana" ? "Hiragana" : "Katakana",
+        done: masteredOf(list),
+        total: list.length,
+      };
+    });
     const grades = COLLECTIONS.filter((c) => c.id.startsWith("grade-")).map(
       (c) => {
         const list = index.list.filter(c.test);
@@ -153,7 +161,7 @@ export function Progress() {
       totalReviews: reviews.length,
       heat: heatmap(byDay, freezes.days, now),
       jlpt,
-      grades,
+      grades: [...kana, ...grades],
       wall: index.jouyou.map((k) => ({ k: k.k, lit: masteredSet.has(k.k) })),
       seals: seals(
         all,
@@ -432,7 +440,7 @@ export function Progress() {
           </div>
         </section>
         <section className="flex flex-col gap-5">
-          <SectionLabel n="03">Por série escolar</SectionLabel>
+          <SectionLabel n="03">Kana e séries escolares</SectionLabel>
           <div className="flex flex-col gap-3">
             {data.grades.map((b) => (
               <div

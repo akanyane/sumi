@@ -250,7 +250,7 @@ export function SettingsView() {
         </Row>
         <Row
           label="Kanji novos por dia"
-          hint="Seguem a ordem do Jōyō (série escolar, depois frequência), depois os que você adicionar."
+          hint="Seguem a ordem do Jouyou (série escolar, depois frequência), depois os que você adicionar."
         >
           <Segmented
             label="Novos por dia"
@@ -259,6 +259,20 @@ export function SettingsView() {
             options={[0, 3, 5, 10, 15].map(
               (v) => [v, String(v)] as [number, string],
             )}
+          />
+        </Row>
+        <Row
+          label="Começar pelo kana"
+          hint="Ensina hiragana e katakana antes dos kanji, no dobro do ritmo de novos por dia."
+        >
+          <Segmented
+            label="Começar pelo kana"
+            value={s.kanaFirst}
+            onChange={set("kanaFirst")}
+            options={[
+              [true, "Ligado"],
+              [false, "Desligado"],
+            ]}
           />
         </Row>
         <Row

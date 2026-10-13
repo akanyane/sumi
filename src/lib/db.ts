@@ -19,7 +19,8 @@ export type ExerciseKind =
   | "audio"
   | "flip"
   | "build"
-  | "write";
+  | "write"
+  | "sound";
 
 export type ReviewEntry = {
   id?: number;

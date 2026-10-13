@@ -86,13 +86,17 @@ async function prepare(
     dailyGoal: s.dailyGoal,
     newPerDay: s.newPerDay + extraNew,
     newToday: extraNew ? 0 : countNewToday(reviews),
+    kanaFirst: s.kanaFirst,
   });
   const strokes = new Map<string, StrokeData | undefined>();
   await Promise.all(
     queue.map(async ({ k }) =>
       strokes.set(
         k,
-        await fetchStrokes(k, !!index.by.get(k)?.sv).catch(() => undefined),
+        // yōon pairs (きゃ) have no stroke file of their own
+        index.by.get(k)?.kana && !index.by.get(k)?.sv
+          ? undefined
+          : await fetchStrokes(k, !!index.by.get(k)?.sv).catch(() => undefined),
       ),
     ),
   );
@@ -244,7 +248,14 @@ function NewKanjiIntro({
   const { data: index } = useKanjiIndex();
   const player = useStrokePlayer(k.k, strokes, { autoplay: 350 });
   const { romaji: showRomaji } = getSettings();
-  const mn = mnemonicFor(k, index);
+  const kana = k.kana;
+  const mn = kana
+    ? kana.origin
+      ? kana.script === "hiragana"
+        ? `Nasceu da escrita cursiva de ${kana.origin}.`
+        : `É um pedaço de ${kana.origin}.`
+      : `${[...k.k][0]} + ${[...k.k][1]} pequeno: as duas sílabas se fundem em uma só.`
+    : mnemonicFor(k, index);
   return (
     <div className="grid w-full max-w-[720px] grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))] items-center gap-x-10 gap-y-6 text-left">
       <div className="flex flex-col items-center gap-3">
@@ -253,7 +264,7 @@ function NewKanjiIntro({
           {!strokes?.p.length && (
             <span
               lang="ja"
-              className="absolute inset-0 grid place-items-center font-k text-[200px] leading-none"
+              className={`absolute inset-0 grid place-items-center font-k leading-none ${[...k.k].length > 1 ? "text-[120px]" : "text-[200px]"}`}
             >
               {k.k}
             </span>
@@ -264,11 +275,26 @@ function NewKanjiIntro({
         )}
       </div>
       <div className="flex flex-col gap-4">
-        <span className="label-mono !text-hanko">Kanji novo · observe</span>
+        <span className="label-mono !text-hanko">
+          {kana ? `${kana.script} novo · observe` : "Kanji novo · observe"}
+        </span>
         <span className="text-[clamp(30px,5cqi,40px)] font-light leading-tight">
           {meaningOf(k)}
         </span>
         <div className="flex flex-col gap-2">
+          {kana && (
+            <span className="flex items-baseline gap-3">
+              <span className="w-9 font-mono text-[10px] tracking-[.12em] text-ink-3">
+                PAR
+              </span>
+              <span lang="ja" className="font-k text-xl">
+                {kana.pair}
+              </span>
+              <span className="font-mono text-xs text-ink-3">
+                {kana.script === "hiragana" ? "katakana" : "hiragana"}
+              </span>
+            </span>
+          )}
           {k.on.length > 0 && (
             <span className="flex items-baseline gap-3">
               <span className="w-9 font-mono text-[10px] tracking-[.12em] text-ink-3">
@@ -309,10 +335,16 @@ function NewKanjiIntro({
             onClick={() => speak(word.r)}
             className="flex items-end gap-4 self-start border-b border-line pb-2 text-left transition-colors hover:border-ink"
           >
-            <ruby lang="ja" className="font-min text-2xl leading-none">
-              {word.w}
-              <rt className="pb-1">{word.r}</rt>
-            </ruby>
+            {word.w === word.r ? (
+              <span lang="ja" className="font-min text-2xl leading-none">
+                {word.w}
+              </span>
+            ) : (
+              <ruby lang="ja" className="font-min text-2xl leading-none">
+                {word.w}
+                <rt className="pb-1">{word.r}</rt>
+              </ruby>
+            )}
             <span className="pb-0.5 text-sm text-ink-2">{word.g}</span>
           </button>
         )}
@@ -401,14 +433,14 @@ function Runner({
       setPick(n);
       setPhase("reveal");
       if (it.mode !== "reading" && k)
-        speak(k.on[0] ?? cleanReading(k.kun[0] ?? ""));
+        speak(k.kana ? k.k : (k.on[0] ?? cleanReading(k.kun[0] ?? "")));
     },
     [phase, it, k],
   );
   const flip = useCallback(() => {
     if (it?.type !== "flip" || phase !== "ask") return;
     setPhase("reveal");
-    if (k) speak(cleanReading(k.kun[0] ?? k.on[0] ?? ""));
+    if (k) speak(k.kana ? k.k : cleanReading(k.kun[0] ?? k.on[0] ?? ""));
   }, [it, phase, k]);
   const tap = useCallback(
     (n: number) => {
@@ -538,8 +570,11 @@ function Runner({
       rTone = correct ? "text-ink" : "text-hanko";
       if (!correct && pick !== null) {
         const pk = it.opts[pick];
-        rNote =
-          it.mode === "pick" || it.mode === "audio"
+        rNote = it.kana
+          ? it.mode === "sound"
+            ? `“${pk.l}” é o som de ${pk.sub}.`
+            : `${pk.l} se lê “${pk.sub}”. Compare a forma com ${it.k}.`
+          : it.mode === "pick" || it.mode === "audio"
             ? `${pk.l} significa “${pk.sub}”. Repare na diferença de forma com ${it.k}.`
             : it.mode === "meaning"
               ? `“${pk.l}” é o significado de ${pk.sub}.`
@@ -611,7 +646,9 @@ function Runner({
 
       <div className="flex min-h-60 flex-1 flex-col items-center justify-center gap-6 text-center">
         {it.type === "mc" &&
-          (it.mode === "meaning" || it.mode === "reading") && (
+          (it.mode === "meaning" ||
+            it.mode === "reading" ||
+            it.mode === "sound") && (
             <>
               <span
                 lang="ja"
@@ -759,7 +796,7 @@ function Runner({
                 setW(s);
                 if (s.done) {
                   setPhase("reveal");
-                  speak(cleanReading(k.kun[0] ?? k.on[0] ?? ""));
+                  speak(k.kana ? k.k : cleanReading(k.kun[0] ?? k.on[0] ?? ""));
                 }
               }}
             />
@@ -807,7 +844,9 @@ function Runner({
             lang="ja"
             className={`text-sm text-ink-2 ${it.type === "flip" && it.isNew ? "hidden" : ""}`}
           >
-            {k.k} · {k.on[0] ?? ""} {kun && `· ${kun}`} — {meaningOf(k)}
+            {k.kana
+              ? `${k.k} · ${k.kana.r} · par ${k.kana.pair}`
+              : `${k.k} · ${k.on[0] ?? ""} ${kun && `· ${kun}`} — ${meaningOf(k)}`}
           </span>
           {rNote && (
             <span className="max-w-[480px] text-[13px] text-pretty text-ink-3">
@@ -848,7 +887,7 @@ function Runner({
                   </span>
                   <span
                     lang={it.mode === "reading" ? "ja" : "pt"}
-                    className={`text-[19px] ${it.mode === "reading" ? "font-goth" : ""}`}
+                    className={`text-[19px] ${it.mode === "reading" ? "font-goth" : it.mode === "sound" ? "font-mono" : ""}`}
                     style={{
                       color:
                         reveal && isPick && !isAns ? "var(--hanko)" : undefined,

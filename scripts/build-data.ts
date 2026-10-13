@@ -18,6 +18,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
+import { buildKanaTable } from "./kana-table";
 
 const ROOT = join(import.meta.dir, "..");
 const CACHE = join(ROOT, ".cache");
@@ -310,7 +311,39 @@ writeFileSync(
   join(OUT, "kanji.json"),
   JSON.stringify({ v: 1, kanjivg: release.tag_name, list: index }),
 );
+// ---------- kana ----------
+const GROUP_RANK = { basic: 0, dakuten: 1, combo: 2 } as const;
+const kanaTable = buildKanaTable()
+  .map((e, n) => ({ e, n }))
+  .sort(
+    (a, b) =>
+      GROUP_RANK[a.e.group] - GROUP_RANK[b.e.group] ||
+      Number(a.e.script === "katakana") - Number(b.e.script === "katakana") ||
+      a.n - b.n,
+  )
+  .map(({ e }) => e);
+const kana = kanaTable.map((e) => {
+  const cp = [...e.k].length === 1 ? (e.k.codePointAt(0) ?? 0) : 0;
+  const file = cp
+    ? join(kvgKanjiDir, `${cp.toString(16).padStart(5, "0")}.svg`)
+    : "";
+  const v =
+    file && existsSync(file) ? parseKvg(readFileSync(file, "utf8")) : null;
+  if (v)
+    writeFileSync(
+      join(OUT, "k", `${cp.toString(16)}.json`),
+      JSON.stringify({
+        p: v.paths,
+        n: v.nums,
+        w: e.ex ? [e.ex] : [],
+        wt: e.ex ? 1 : 0,
+      }),
+    );
+  return { ...e, s: v?.paths.length ?? 0, sv: v ? 1 : 0 };
+});
+writeFileSync(join(OUT, "kana.json"), JSON.stringify({ v: 1, list: kana }));
+
 const files = readdirSync(join(OUT, "k")).length;
 console.log(
-  `✓ ${index.length} kanji · ${files} stroke files · KanjiVG ${release.tag_name}`,
+  `✓ ${index.length} kanji · ${kana.length} kana · ${files} stroke files · KanjiVG ${release.tag_name}`,
 );

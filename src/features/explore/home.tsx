@@ -221,58 +221,96 @@ function TodayStrip() {
   );
 }
 
+const KANA_COLLECTIONS = [
+  {
+    id: "hiragana",
+    script: "hiragana",
+    label: "Hiragana",
+    ja: "平仮名",
+    href: "/kana#hiragana",
+  },
+  {
+    id: "katakana",
+    script: "katakana",
+    label: "Katakana",
+    ja: "片仮名",
+    href: "/kana#katakana",
+  },
+] as const;
+
 function Collections({ active }: { active?: string }) {
   const { data: index } = useKanjiIndex();
   const cards = useCards();
   const rows = useMemo(() => {
     if (!index) return null;
     const now = new Date();
-    return COLLECTIONS.map((c) => {
-      const members = index.list.filter(c.test);
-      const done = cards
+    const count = (members: { k: string }[]) =>
+      cards
         ? members.filter((k) => statusOf(cards.get(k.k), now) === "mastered")
             .length
         : 0;
-      return { ...c, total: members.length, done };
+    const kana = KANA_COLLECTIONS.map((c) => {
+      const members = index.kana.filter((k) => k.kana?.script === c.script);
+      return { ...c, total: members.length, done: count(members) };
     });
+    return [
+      ...kana,
+      ...COLLECTIONS.map((c) => {
+        const members = index.list.filter(c.test);
+        return {
+          ...c,
+          href: `/${c.id}`,
+          total: members.length,
+          done: count(members),
+        };
+      }),
+    ];
   }, [index, cards]);
   return (
     <section aria-labelledby="col" className="flex flex-col gap-5">
       <SectionLabel n="01" id="col">
         Coleções
       </SectionLabel>
-      <div className="hairline-grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))]">
-        {(rows ?? COLLECTIONS.map((c) => ({ ...c, total: 0, done: 0 }))).map(
-          (c) => (
-            <Link
-              key={c.id}
-              href={`/${c.id}`}
-              className={`flex min-h-24 flex-col gap-3.5 p-4 no-underline transition-colors hover:!bg-paper-2 ${active === c.id ? "!bg-paper-2" : ""}`}
-            >
-              <span className="flex items-baseline justify-between gap-2">
-                <span className="text-[15px]">{c.label}</span>
-                <span lang="ja" className="font-min text-[13px] text-ink-3">
-                  {c.ja}
-                </span>
+      <div className="hairline-grid grid-cols-2 @min-[560px]:grid-cols-4">
+        {(
+          rows ?? [
+            ...KANA_COLLECTIONS.map((c) => ({ ...c, total: 0, done: 0 })),
+            ...COLLECTIONS.map((c) => ({
+              ...c,
+              href: `/${c.id}`,
+              total: 0,
+              done: 0,
+            })),
+          ]
+        ).map((c) => (
+          <Link
+            key={c.id}
+            href={c.href}
+            className={`flex min-h-24 flex-col gap-3.5 p-4 no-underline transition-colors hover:!bg-paper-2 ${active === c.id ? "!bg-paper-2" : ""}`}
+          >
+            <span className="flex items-baseline justify-between gap-2">
+              <span className="text-[15px]">{c.label}</span>
+              <span lang="ja" className="font-min text-[13px] text-ink-3">
+                {c.ja}
               </span>
-              <span className="flex-1" />
-              <span className="flex flex-col gap-1.5">
-                <span className="relative h-0.5 bg-line">
-                  <span
-                    className="absolute inset-y-0 left-0 bg-ink transition-[width] duration-700"
-                    style={{
-                      width: c.total ? `${(c.done / c.total) * 100}%` : 0,
-                    }}
-                  />
-                </span>
-                <span className="flex justify-between font-mono text-[10px] text-ink-3">
-                  <span>{c.done} dominados</span>
-                  <span>{c.total ? c.total.toLocaleString("pt-BR") : "—"}</span>
-                </span>
+            </span>
+            <span className="flex-1" />
+            <span className="flex flex-col gap-1.5">
+              <span className="relative h-0.5 bg-line">
+                <span
+                  className="absolute inset-y-0 left-0 bg-ink transition-[width] duration-700"
+                  style={{
+                    width: c.total ? `${(c.done / c.total) * 100}%` : 0,
+                  }}
+                />
               </span>
-            </Link>
-          ),
-        )}
+              <span className="flex justify-between font-mono text-[10px] text-ink-3">
+                <span>{c.done} dominados</span>
+                <span>{c.total ? c.total.toLocaleString("pt-BR") : "—"}</span>
+              </span>
+            </span>
+          </Link>
+        ))}
       </div>
     </section>
   );
