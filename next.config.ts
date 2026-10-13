@@ -2,9 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   agentRules: false,
-  experimental: {
-    optimizePackageImports: ["@chakra-ui/react"],
-  },
+  devIndicators: false,
   // kanjiapi.dev accepts both romanizations; keep a single canonical page for each list
   async redirects() {
     return [

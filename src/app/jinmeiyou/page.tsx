@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
-import { KanjiList } from "@/components";
+import { CollectionView } from "@/features/explore/home";
 
-export const metadata: Metadata = {
-  title: "Jinmeiyou",
-};
+export const metadata: Metadata = { title: "Jinmeiyō" };
 
-export default function Jinmeiyou() {
-  return <KanjiList list="jinmeiyou" />;
+export default function Page() {
+  return <CollectionView id="jinmeiyou" />;
 }

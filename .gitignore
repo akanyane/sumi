@@ -32,3 +32,10 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# dataset build cache
+.cache
+
+# design handoff (local only)
+*.zip
+*:Zone.Identifier

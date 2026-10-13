@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { KanjiDetail } from "@/components";
+import { KanjiDetail } from "@/features/kanji/detail";
 
 type Props = {
   params: Promise<{ character: string }>;

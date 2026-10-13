@@ -1,5 +1,5 @@
-import { KanjiList } from "@/components";
+import { Home } from "@/features/explore/home";
 
-export default function Home() {
-  return <KanjiList list="all" limit={100} />;
+export default function HomePage() {
+  return <Home />;
 }

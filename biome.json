@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!next-env.d.ts"]
+    "includes": ["**", "!next-env.d.ts", "!public/data"]
   },
   "formatter": {
     "enabled": true,
@@ -16,17 +16,30 @@
   },
   "linter": {
     "enabled": true,
-    "rules": { "preset": "recommended" },
+    "rules": {
+      "preset": "recommended"
+    },
     "domains": {
       "next": "recommended",
       "react": "recommended"
     }
   },
   "javascript": {
-    "formatter": { "quoteStyle": "double" }
+    "formatter": {
+      "quoteStyle": "double"
+    }
   },
   "assist": {
     "enabled": true,
-    "actions": { "source": { "organizeImports": "on" } }
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
   }
 }

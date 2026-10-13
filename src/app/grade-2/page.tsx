@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
-import { KanjiList } from "@/components";
+import { CollectionView } from "@/features/explore/home";
 
-export const metadata: Metadata = {
-  title: "Grade 2",
-};
+export const metadata: Metadata = { title: "Série 2" };
 
-export default function Grade2() {
-  return <KanjiList list="grade-2" />;
+export default function Page() {
+  return <CollectionView id="grade-2" />;
 }
