@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/akanyane/sumi/compare/sumi-v0.1.1...sumi-v0.1.2) (2026-10-13)
+
+
+### Features
+
+* add hiragana and katakana course ([1dc3977](https://github.com/akanyane/sumi/commit/1dc39773517b9a26c43dcbd0dbf1b93f108e909e))
+
 ## [0.1.1](https://github.com/akanyane/sumi/compare/sumi-v0.1.0...sumi-v0.1.1) (2026-10-13)
 
 
